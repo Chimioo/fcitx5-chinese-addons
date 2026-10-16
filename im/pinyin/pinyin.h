@@ -121,9 +121,11 @@ FCITX_CONFIG_ENUM_NAME_WITH_I18N(
 enum class CorrectionLayout {
     None,
     Qwerty,
+    SmartQwerty,
 };
 
-FCITX_CONFIG_ENUM_NAME_WITH_I18N(CorrectionLayout, N_("None"), N_("QWERTY"))
+FCITX_CONFIG_ENUM_NAME_WITH_I18N(CorrectionLayout, N_("None"), N_("QWERTY"),
+                                 N_("Smart QWERTY"))
 
 FCITX_CONFIGURATION(
     FuzzyConfig, Option<bool> ue{this, "VE_UE", _("ue -> ve"), true};
@@ -155,7 +157,7 @@ FCITX_CONFIGURATION(
     Option<bool> z{this, "Z_ZH", _("z <-> zh"), false};
     OptionWithAnnotation<CorrectionLayout, CorrectionLayoutI18NAnnotation>
         correction{this, "Correction", _("Correction Layout"),
-                   (isAndroid() || isIOS()) ? CorrectionLayout::Qwerty
+                   (isAndroid() || isIOS()) ? CorrectionLayout::SmartQwerty
                                             : CorrectionLayout::None};)
 
 FCITX_CONFIGURATION(

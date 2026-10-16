@@ -1227,12 +1227,23 @@ void PinyinEngine::populateConfig() {
                 std::make_shared<libime::PinyinCorrectionProfile>(
                     libime::BuiltinPinyinCorrectionProfile::Qwerty);
             break;
+        case CorrectionLayout::SmartQwerty:
+            correctionProfile =
+                std::make_shared<libime::PinyinCorrectionProfile>(
+                    libime::BuiltinPinyinCorrectionProfile::SmartQwerty);
+            break;
         }
         ime_->setCorrectionProfile(std::move(correctionProfile));
     }
 
     if (ime_->correctionProfile()) {
         flags |= libime::PinyinFuzzyFlag::Correction;
+        // Smart profile uses tiered flags; enable them together.
+        if (*fuzzyConfig.correction == CorrectionLayout::SmartQwerty) {
+            flags |= libime::PinyinFuzzyFlags{
+                libime::PinyinFuzzyFlag::SmartCorrection,
+                libime::PinyinFuzzyFlag::SmartCorrectionFar};
+        }
     }
     ime_->setFuzzyFlags(flags);
 
