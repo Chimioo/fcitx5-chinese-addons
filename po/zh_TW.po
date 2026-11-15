@@ -383,6 +383,18 @@ msgstr "精確匹配"
 msgid "Learning"
 msgstr "學習"
 
+#: im/pinyin/pinyin.h:242
+msgid "Learn personalized correction preferences"
+msgstr "個人化學習糾錯習慣"
+
+#: im/pinyin/pinyin.h:245
+msgid "Boost personalized candidate preferences"
+msgstr "個人化提升常用候選詞排序"
+
+#: im/pinyin/pinyin.h:248
+msgid "Learn typo corrections after backspace"
+msgstr "退格改錯關聯學習（依相似度記住糾錯詞）"
+
 #: im/table/ime.h:293
 msgid "Display Hint for word"
 msgstr "顯示單字提示"

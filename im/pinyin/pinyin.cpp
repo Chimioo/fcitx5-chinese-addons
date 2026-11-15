@@ -937,6 +937,22 @@ PinyinEngine::PinyinEngine(Instance *instance)
             PINYIN_ERROR() << "Failed to load pinyin history: " << e.what();
         }
     } while (0);
+    do {
+        auto file = standardPath.open(StandardPathsType::PkgData,
+                                      "pinyin/user.personal",
+                                      StandardPathsMode::User);
+        if (!file.isValid()) {
+            break;
+        }
+        try {
+            IFDStreamBuf buffer(file.fd());
+            std::istream in(&buffer);
+            ime_->loadPersonalProfile(in);
+        } catch (const std::exception &e) {
+            PINYIN_ERROR() << "Failed to load pinyin personal profile: "
+                           << e.what();
+        }
+    } while (0);
 
     ime_->setScoreFilter(1);
     loadBuiltInDict();
@@ -1187,6 +1203,9 @@ void PinyinEngine::populateConfig() {
     ime_->setPreeditMode(*config_.showActualPinyinInPreedit
                              ? libime::PinyinPreeditMode::Pinyin
                              : libime::PinyinPreeditMode::RawText);
+    ime_->setAdaptiveCorrectionLearning(*config_.adaptiveCorrectionLearning);
+    ime_->setAdaptiveCandidateLearning(*config_.adaptiveCandidateLearning);
+    ime_->setAdaptiveBackspaceLearning(*config_.adaptiveBackspaceLearning);
 
     // Setup fuzzy flags.
     libime::PinyinFuzzyFlags flags;
@@ -1735,8 +1754,10 @@ void PinyinEngine::forgetCandidate(InputContext *inputContext, size_t index) {
             state->context_.ime()->dict()->removeWord(
                 libime::PinyinDictionary::UserDict, py, sentence.toString());
         }
+        state->context_.ime()->forgetPersonalWord(sentence.toString());
         for (const auto &word : sentence.sentence()) {
             state->context_.ime()->model()->history().forget(word->word());
+            state->context_.ime()->forgetPersonalWord(word->word());
         }
     }
     resetForgetCandidate(inputContext);
@@ -2422,6 +2443,7 @@ void PinyinEngine::setSubConfig(const std::string &path,
     } else if (path == "clearalldict") {
         ime_->dict()->clear(libime::PinyinDictionary::UserDict);
         ime_->model()->history().clear();
+        ime_->clearPersonalProfile();
     } else if (path == "customphrase") {
         loadCustomPhrase();
     }
@@ -2475,6 +2497,19 @@ void PinyinEngine::save() {
                 return true;
             } catch (const std::exception &e) {
                 PINYIN_ERROR() << "Failed to save pinyin history: " << e.what();
+                return false;
+            }
+        });
+    standardPath.safeSave(
+        StandardPathsType::PkgData, "pinyin/user.personal", [this](int fd) {
+            OFDStreamBuf buffer(fd);
+            std::ostream out(&buffer);
+            try {
+                ime_->savePersonalProfile(out);
+                return static_cast<bool>(out);
+            } catch (const std::exception &e) {
+                PINYIN_ERROR() << "Failed to save pinyin personal profile: "
+                               << e.what();
                 return false;
             }
         });

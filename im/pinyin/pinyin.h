@@ -237,6 +237,15 @@ FCITX_CONFIGURATION(
                                   _("Action when switching input method"),
                                   SwitchInputMethodBehavior::CommitPreedit};
     Option<bool> learning{this, "Learning", _("Learning"), true};
+    Option<bool> adaptiveCorrectionLearning{
+        this, "AdaptiveCorrectionLearning",
+        _("Learn personalized correction preferences"), true};
+    Option<bool> adaptiveCandidateLearning{
+        this, "AdaptiveCandidateLearning",
+        _("Boost personalized candidate preferences"), true};
+    Option<bool> adaptiveBackspaceLearning{
+        this, "AdaptiveBackspaceLearning",
+        _("Learn typo corrections after backspace"), true};
     KeyListOption forgetWord{this,
                              "ForgetWord",
                              _("Forget word"),
